@@ -2,13 +2,12 @@ import { useTrailer } from "../../Context";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import logo from "../../files/logo pag.png";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./style.css";
 
 export default function Admin() {
   const [trailers, setTrailers] = useState([]);
-  const {deleteTrailer} = useTrailer();
-  const navigate = useNavigate();
+  const { deleteTrailer } = useTrailer();
 
   useEffect(() => {
     axios("http://localhost:4000/trailer").then((response) =>
@@ -16,8 +15,8 @@ export default function Admin() {
     );
   }, []);
 
-  function handleDelete(_id) {
-    deleteTrailer(_id);
+  function handleDelete(id) {
+    deleteTrailer(id);
   }
 
   return (
@@ -71,8 +70,11 @@ export default function Admin() {
                 <td>{trailer.actors}</td>
                 <td>
                   <button>Edit</button>
-                  <button 
-                  >Delete</button>
+                  <button onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(trailer._id)}}>
+                  Delete
+                  </button>
                 </td>
               </tr>
             ))}
