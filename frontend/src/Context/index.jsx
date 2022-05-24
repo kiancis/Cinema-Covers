@@ -1,11 +1,5 @@
 import { useState, useContext, createContext, useEffect } from "react";
-import {
-  getTrailersRequests,
-  createTrailersRequests,
-  deleteTrailersRequests,
-  getTrailerRequests,
-  updateTrailerRequests,
-} from "../Api";
+import axios from "axios";
 
 const trailerContext = createContext();
 
@@ -18,44 +12,44 @@ export const TrailerProvider = ({ children }) => {
   const [trailers, setTrailers] = useState([]);
 
   const getTrailers = async () => {
-    const res = await getTrailersRequests();
-    setTrailers(res);
+    const res = await axios.get("http://localhost:4000/trailer");
+    setTrailers(res.data);
   };
 
   const createTrailer = async (trailer) => {
-    const res = await createTrailersRequests();
-    setTrailers([...trailers, res]);
+    const res = await axios.post("http://localhost:4000/trailer", trailer);
+    setTrailers([...trailers, res.data]);
   };
   const deleteTrailer = async (_id) => {
-    await deleteTrailersRequests(_id);
+    await axios.delete(`http://localhost:4000/trailer/${_id}`);
     setTrailers(trailers.filter((trailer) => trailer._id !== _id));
   };
   const updateTrailer = async (id, trailer) => {
-    await updateTrailerRequests(id, trailer);
+    await axios.put(`http://localhost:4000/trailer/${id}`, trailer);
     setTrailers(
-      trailers.map((trailer) => (trailer.id === id ? trailer : trailer))
+      trailers.map((trailer) => (trailer._id === id ? trailer : trailer))
     );
   };
   const getTrailer = async (id) => {
-    const res = await getTrailerRequests(id);
-    setTrailers(trailers.map((trailer) => (trailer.id === id ? res : trailer)));
-  }
+    const res = await axios.get(`http://localhost:4000/trailer/${id}`);
+    return res.data;
+  };
 
-    useEffect(() => {
-        getTrailers();
-    }, []);
+  useEffect(() => {
+    getTrailers();
+  }, []);
 
-    return (
-        <trailerContext.Provider
-            value={{
-                trailers,
-                createTrailer,
-                deleteTrailer,
-                updateTrailer,
-                getTrailer,
-            }}
-        >
-         {children}
-        </trailerContext.Provider>
-    );
+  return (
+    <trailerContext.Provider
+      value={{
+        trailers,
+        createTrailer,
+        deleteTrailer,
+        updateTrailer,
+        getTrailer,
+      }}
+    >
+      {children}
+    </trailerContext.Provider>
+  );
 };

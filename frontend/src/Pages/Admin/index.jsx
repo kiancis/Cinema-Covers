@@ -1,4 +1,3 @@
-import { useTrailer } from "../../Context";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import logo from "../../files/logo pag.png";
@@ -7,7 +6,6 @@ import "./style.css";
 
 export default function Admin() {
   const [trailers, setTrailers] = useState([]);
-  const { deleteTrailer } = useTrailer();
 
   useEffect(() => {
     axios("http://localhost:4000/trailer").then((response) =>
@@ -15,9 +13,10 @@ export default function Admin() {
     );
   }, []);
 
-  function handleDelete(id) {
-    deleteTrailer(id);
-  }
+  const handleDelete = (_id) => {
+    axios.delete(`http://localhost:4000/trailer/${_id}`);
+    setTrailers(trailers.filter((trailer) => trailer._id !== _id));
+  };
 
   return (
     <>
@@ -69,11 +68,14 @@ export default function Admin() {
                 <td>{trailer.director}</td>
                 <td>{trailer.actors}</td>
                 <td>
-                  <button>Edit</button>
-                  <button onClick={(e) => {
-                  e.stopPropagation();
-                  handleDelete(trailer._id)}}>
-                  Delete
+                  <button className="edit">Edit</button>
+                  <button className="delete"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(trailer._id);
+                    }}
+                  >
+                    Delete
                   </button>
                 </td>
               </tr>
